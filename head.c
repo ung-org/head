@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#define _XOPEN_SOURCE 700
+#define _POSIX_C_SOURCE 2
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,13 +41,12 @@ static int head(const char *path, int nlines)
 		return 1;
 	}
 
-	while (!feof(f) && nlines > 0) {
-		char *line = NULL;
-		size_t n = 0;
-
-		getline(&line, &n, f);
-		fputs(line, stdout);
-		nlines--;
+	int c;
+	while ((c = fgetc(f)) != EOF && nlines > 0) {
+		putchar(c);
+		if (c == '\n') {
+			nlines--;
+		}
 	}
 
 	if (f != stdin) {
