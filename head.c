@@ -37,7 +37,7 @@ static int head(const char *path, int nlines)
 	}
 
 	if (f == NULL) {
-		fprintf(stderr, "FIXME: Couldn't open %s: %s\n", path ? path : "stdin", strerror(errno));
+		fprintf(stderr, "head: %s: %s\n", path, strerror(errno));
 		return 1;
 	}
 
@@ -64,12 +64,12 @@ int main(int argc, char **argv)
 	char *end;
 
 	int c;
-	while ((c = getopt(argc, argv, ":n:")) != -1) {
+	while ((c = getopt(argc, argv, "n:")) != -1) {
 		switch (c) {
 		case 'n':
 			lines = strtol(optarg, &end, 10);
-			if (end != NULL && strlen(end) > 0) {
-				fprintf(stderr, "head: Invalid number %s\n", optarg);
+			if (*end != '\0') {
+				fprintf(stderr, "head: invalid number %s\n", optarg);
 				return 1;
 			}
 			break;
