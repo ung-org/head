@@ -23,7 +23,9 @@
  */
 
 #define _POSIX_C_SOURCE 2
+#include <ctype.h>
 #include <errno.h>
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -56,13 +58,40 @@ static int head(const char *path, int nlines)
 	return 0;
 }
 
+static void fixobsolete(int argc, char *argv[])
+{
+	for (int i = 1; i < argc; i++) {
+		if (argv[i][0] != '-') {
+			return;
+		}
+
+		if (!strcmp(argv[i], "--")) {
+			return;
+		}
+
+		if (isdigit(argv[i][1])) {
+			fprintf(stderr, "head: '-#' is obsolete; use '-n #'\n");
+			char *opt = malloc(strlen(argv[i]) + 2);
+			if (opt == NULL) {
+				perror("strings");
+				exit(1);
+			}
+			sprintf(opt, "-n %s", argv[i] + 1);
+			argv[i] = opt;
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
+	setlocale(LC_ALL, "");
+
 	int lines = 10;
 	int showname = 0;
 	char *end;
 
 	int c;
+	fixobsolete(argc, argv);
 	while ((c = getopt(argc, argv, "n:")) != -1) {
 		switch (c) {
 		case 'n':
